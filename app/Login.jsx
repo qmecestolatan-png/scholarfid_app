@@ -1,70 +1,94 @@
+import React, { useState } from 'react'
 import {
-  StyleSheet,
+  ScrollView,
   View,
   Text,
   TextInput,
   Image,
-  ScrollView,
-  Pressable
+  Pressable,
+  Alert,
+  StyleSheet
 } from 'react-native'
-import React from 'react'
+import { supabase } from '../lib/supabase'
+import { router } from 'expo-router'
 import logo from '../images/loginlogo.png'
-import {router} from 'expo-router'
-
 
 const Login = () => {
+  const [adminId, setAdminId] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleLogin = async () => {
+  if (!adminId || !password) {
+    Alert.alert('Error', 'Please enter ID and password')
+    return
+  }
+
+  const idNumber = Number(adminId)
+  const passwordTrimmed = password.trim()
+
+  console.log('Trying login:', { idNumber, passwordTrimmed })
+
+  const { data, error } = await supabase
+    .from('admin')
+    .select('*')
+    .eq('id', idNumber)
+    .eq('password', passwordTrimmed)
+
+  console.log('Supabase response:', { data, error })
+
+  if (error) {
+    Alert.alert('Error', error.message)
+  } else if (!data || data.length === 0) {
+    Alert.alert('Login Failed', 'Invalid ID or password')
+  } else {
+    Alert.alert('Login Success!')
+    router.push('/Dashboard')
+  }
+}
+
   return (
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.container}>
-
-            {}
-            <View style={styles.imageContainer}>
-              <Image source={logo} style={styles.image} />
-            </View>
-
-            {}
-            <Text style={styles.welcome}>WELCOME BACK, ADMIN!</Text>
-
-            {}
-            <View style={styles.card}>
-              <Text style={styles.signIn}>SIGN IN</Text>
-
-              {}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>ADMIN ID:</Text>
-                <TextInput
-                  placeholder="Enter your ID"
-                  placeholderTextColor="#999"
-                  style={styles.input}
-                />
-              </View>
-
-              {}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>PASSWORD:</Text>
-                <TextInput
-                  placeholder="Enter password"
-                  placeholderTextColor="#999"
-                  secureTextEntry
-                  style={styles.input}
-                />
-              </View>
-
-              {}
-              <Pressable 
-  style={styles.button}
-  onPress={() => router.push('/Dashboard')}
->
-  <Text style={styles.buttonText}>LOG IN</Text>
-</Pressable>
-            </View>
-
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="always"
+      showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image source={logo} style={styles.image} />
+        </View>
+        <Text style={styles.welcome}>WELCOME BACK, ADMIN!</Text>
+        <View style={styles.card}>
+          <Text style={styles.signIn}>SIGN IN</Text>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>ADMIN ID:</Text>
+            <TextInput
+              placeholder="Enter your ID"
+              placeholderTextColor="#999"
+              value={adminId}
+              onChangeText={setAdminId}
+              keyboardType="numeric"
+              style={styles.input}
+            />
           </View>
-        </ScrollView>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>PASSWORD:</Text>
+            <TextInput
+              placeholder="Enter password"
+              placeholderTextColor="#999"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input}
+            />
+          </View>
+          <Pressable
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'LOG IN'}</Text>
+          </Pressable>
+        </View>
+      </View>
+    </ScrollView>
   )
 }
 
@@ -133,7 +157,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-
+  
   button: {
     marginTop: 15,
     backgroundColor: '#0f3f4f',
