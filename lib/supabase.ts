@@ -1,7 +1,5 @@
-// lib/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 
-// Make sure your .env variables are correctly set
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY = process.env.EXPO_PUBLIC_SUPABASE_KEY
 
