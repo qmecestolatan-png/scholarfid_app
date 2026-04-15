@@ -16,7 +16,6 @@ const Dashboard = () => {
   const [records, setRecords] = useState([])
   const [logs, setLogs] = useState([])
 
-  // 🔹 Fetch initial data
   const fetchData = async () => {
     const { data: recordData } = await supabase
       .from('records')
@@ -25,7 +24,7 @@ const Dashboard = () => {
       .limit(5)
 
     const { data: logData } = await supabase
-      .from('audit_log')
+      .from('audit_logs')
       .select('*')
       .order('id', { ascending: false })
       .limit(5)
@@ -34,7 +33,6 @@ const Dashboard = () => {
     if (logData) setLogs(logData)
   }
 
-  // 🔹 Real-time updates
   useEffect(() => {
   fetchData()
 
@@ -46,7 +44,6 @@ const Dashboard = () => {
   return () => clearInterval(interval)
 }, [])
 
-  // 🔹 Logout
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.replace('/Login')
@@ -66,10 +63,10 @@ const Dashboard = () => {
           </View>
         </View>
 
-        {/* 🔹 RECENT LOGS */}
+        {}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Logs</Text>
-          <TouchableOpacity onPress={() => router.push("/audit_log")}>
+          <TouchableOpacity onPress={() => router.push("/audit_logs")}>
             <Text style={styles.viewText}>VIEW ALL</Text>
           </TouchableOpacity>
         </View>
@@ -80,7 +77,7 @@ const Dashboard = () => {
           </View>
         ))}
 
-        {/* 🔹 RECENT RECORDS */}
+        {}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Records</Text>
           <TouchableOpacity onPress={() => router.push("/records")}>
@@ -95,12 +92,37 @@ const Dashboard = () => {
         ))}
 
       </ScrollView>
-
-      {/* LOGOUT */}
+      
+      {}
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
+{/* BOTTOM NAV */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          onPress={() => router.push("/Dashboard")}
+          style={styles.navItem}
+        >
+          <Ionicons name="home-outline" size={20} color="#666" />
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity
+          onPress={() => router.push("/audit_log")}
+          style={styles.navItem}
+        >
+          <Ionicons name="document-text-outline" size={20} color="#fff" />
+          <Text style={styles.navText}>Logs</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/records")}
+          style={styles.navItem}
+        >
+          <Ionicons name="person-outline" size={20} color="#666" />
+          <Text style={styles.navText}>Records</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
